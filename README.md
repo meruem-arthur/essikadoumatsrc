@@ -29,7 +29,27 @@ Public queries fail soft, so the build succeeds even before the DB is populated.
 5. Admin → **Site → Home Stats**, **Footer Links**, **Page Banners** (a banner photo per page).
 6. Media: create an **Album**, then click **Photos** to upload many at once; add captions there.
 
+## Features added after v1
+- **Contact alerts:** new messages are emailed to Settings → contact email (or `CONTACT_NOTIFY_EMAIL`); Reply goes straight to the sender. Messages are always saved in Admin → Messages first.
+- **Rate limiting** (database-backed, no extra service): contact form 3/hour per IP; login 5 failures per email / 20 per IP per 15 min; reset requests 10/hour per IP.
+- **Cloudinary cleanup:** replacing or deleting an image/record/album removes the file from Cloudinary (best effort, only inside `umat-src/`).
+- **Gallery ordering:** Admin → Media Albums → Photos: ← → reorder, Make first, Set cover. First upload becomes the cover automatically.
+- **Videos:** Admin → Videos (YouTube). Shown on /media with click-to-play (no YouTube scripts load until pressed).
+- **Search:** `/search` across news, projects, events, executives, committees (magnifier in the header).
+- **Draft preview:** in admin lists, “Preview ↗” opens a draft/unpublished item exactly as visitors would see it (admins only).
+- **Activity log:** Admin → Activity log (Super Admin): who created/updated/deleted what.
+- **Analytics:** Vercel Web Analytics is included. Enable it in the Vercel dashboard → Analytics tab (privacy-friendly, no cookies).
+- **Launch checklist:** on the admin dashboard, shows what content is still missing before launch.
+After pulling this update run `npm run db:generate && npm run db:migrate` (new tables: `rate_events`, `videos`, `audit_log`).
+
+## Roles & who does what
+- **Super Admin** (created by the seed script): everything, plus adding/removing admins (Admin Users) and the Activity log. Give this to one or two trusted people.
+- **Admin**: manages all content and site settings (hero images, page text, quick links, executives, news, gallery, messages…) but cannot add/edit users or see the Activity log.
+- **Secretariat / Media Team**: optional limited roles for helpers.
+Flow: the Super Admin signs in → Admin Users → adds each admin with a temporary password → the admin signs in and changes it under My account (or uses Forgot password).
+
 ## Admin notes
+- **Forgot password:** `/admin/forgot-password` emails a single-use link (30 min). Needs `RESEND_API_KEY` + `MAIL_FROM` (verify your domain in Resend). Without them, local dev prints the link in the terminal and production refuses to send. After pulling this update run `npm run db:generate && npm run db:migrate` (new `password_resets` table).
 - Admin lives at `/admin` on whatever domain you attach in Vercel (e.g. `essikadoumatsrc.com/admin`). Set `NEXT_PUBLIC_SITE_URL` to that domain.
 - **Admin Users** (Super Admin only): add users, assign roles, disable, reset passwords. Everyone can change their own password under **My account**; changing a password signs out all other sessions. The last active Super Admin can't be removed or disabled.
 - Content types live in `src/features/admin/resources.ts`: one entry = list + form + validation + permission.

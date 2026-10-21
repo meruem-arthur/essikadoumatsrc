@@ -15,3 +15,14 @@ export function signUpload(folder: string) {
   };
 }
 export const cloudinaryPrefix = () => `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/`;
+
+/** Best-effort removal of an uploaded image. Only touches our own folder; never throws (a leftover file is harmless). */
+export async function destroyImage(publicId?: string | null) {
+  try {
+    if (!publicId || !publicId.startsWith("umat-src/")) return;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = createHash("sha1").update(`public_id=${publicId}&timestamp=${timestamp}${process.env.CLOUDINARY_API_SECRET!}`).digest("hex");
+    const body = new URLSearchParams({ public_id: publicId, timestamp: String(timestamp), api_key: process.env.CLOUDINARY_API_KEY!, signature });
+    await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/destroy`, { method: "POST", body });
+  } catch (e) { console.error("[cloudinary destroy]", (e as Error).message); }
+}

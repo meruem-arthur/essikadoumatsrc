@@ -28,6 +28,14 @@ export const users = pgTable("users", {
   isActive: boolean("is_active").notNull().default(true), lastLoginAt: timestamp("last_login_at"), ...stamps,
 });
 
+/** Single-use password reset tokens. Only a SHA-256 hash of the token is stored. */
+export const passwordResets = pgTable("password_resets", {
+  id: id(), userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(), usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("pr_user_idx").on(t.userId)]);
+
 // ---- People ----
 export const executives = pgTable("executives", {
   id: id(), fullName: text("full_name").notNull(), slug: slug(), position: text("position").notNull(),
@@ -129,3 +137,23 @@ export const heroSlides = pgTable("hero_slides", {
   ctaLabel: text("cta_label"), ctaHref: text("cta_href"), secondaryCtaLabel: text("secondary_cta_label"), secondaryCtaHref: text("secondary_cta_href"),
   isActive: boolean("is_active").notNull().default(true), displayOrder: integer("display_order").notNull().default(0), ...stamps,
 });
+
+// ---- Security, media & history ----
+/** Lightweight rate limiting: one row per event, counted inside a time window (works on serverless, no Redis). */
+export const rateEvents = pgTable("rate_events", {
+  id: id(), bucket: text("bucket").notNull(), key: text("key").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("rate_lookup_idx").on(t.bucket, t.key, t.createdAt)]);
+
+export const videos = pgTable("videos", {
+  id: id(), title: text("title").notNull(), url: text("url").notNull(), youtubeId: text("youtube_id").notNull(),
+  description: text("description"), isFeatured: boolean("is_featured").notNull().default(false),
+  status: publishStatus("status").notNull().default("draft"), displayOrder: integer("display_order").notNull().default(0), ...stamps,
+});
+
+/** Who changed what. userName is copied so history survives user deletion. */
+export const auditLog = pgTable("audit_log", {
+  id: id(), userId: uuid("user_id"), userName: text("user_name").notNull(), action: text("action").notNull(),
+  resource: text("resource").notNull(), recordId: text("record_id"), label: text("label"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("audit_created_idx").on(t.createdAt)]);

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, gte, isNull, lte, or, isNotNull, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, isNull, lte, or, isNotNull, ne } from "drizzle-orm";
 import { db } from "@/db";
 import * as s from "@/db/schema";
 
@@ -82,24 +82,24 @@ export const membersOfKind = safe((kind: "committee" | "judicial" | "nugs") =>
 const live = () => and(eq(s.news.status, "published"), lte(s.news.publishedAt, new Date()));
 export const publishedNews = safe((limit: number = 50, category?: string) =>
   db.select().from(s.news).where(and(live(), category ? eq(s.news.category, category) : undefined)).orderBy(desc(s.news.publishedAt)).limit(limit), []);
-export const newsBySlug = safe(async (slug: string) => first(await db.select().from(s.news).where(and(eq(s.news.slug, slug), live()))), undefined);
+export const newsBySlug = safe(async (slug: string, preview: boolean = false) => first(await db.select().from(s.news).where(and(eq(s.news.slug, slug), preview ? undefined : live()))), undefined);
 export const relatedNews = safe((id: string) => db.select().from(s.news).where(and(live(), ne(s.news.id, id))).orderBy(desc(s.news.publishedAt)).limit(3), []);
 
 export const publishedProjects = safe((limit: number = 50) =>
   db.select().from(s.projects).where(eq(s.projects.publishStatus, "published")).orderBy(desc(s.projects.isFeatured), desc(s.projects.createdAt)).limit(limit), []);
-export const projectBySlug = safe(async (slug: string) => first(await db.select().from(s.projects).where(and(eq(s.projects.slug, slug), eq(s.projects.publishStatus, "published")))), undefined);
+export const projectBySlug = safe(async (slug: string, preview: boolean = false) => first(await db.select().from(s.projects).where(and(eq(s.projects.slug, slug), preview ? undefined : eq(s.projects.publishStatus, "published")))), undefined);
 
 export const upcomingEvents = safe((limit: number = 50) =>
   db.select().from(s.events).where(and(eq(s.events.status, "published"), gte(s.events.startsAt, new Date()))).orderBy(asc(s.events.startsAt)).limit(limit), []);
 export const pastEvents = safe((limit: number = 50) =>
   db.select().from(s.events).where(and(eq(s.events.status, "published"), lte(s.events.startsAt, new Date()))).orderBy(desc(s.events.startsAt)).limit(limit), []);
-export const eventBySlug = safe(async (slug: string) => first(await db.select().from(s.events).where(and(eq(s.events.slug, slug), eq(s.events.status, "published")))), undefined);
+export const eventBySlug = safe(async (slug: string, preview: boolean = false) => first(await db.select().from(s.events).where(and(eq(s.events.slug, slug), preview ? undefined : eq(s.events.status, "published")))), undefined);
 
 export const latestAnnouncement = safe(async () => first(await db.select().from(s.announcements).where(and(eq(s.announcements.status, "published"),
   or(isNull(s.announcements.expiresAt), gte(s.announcements.expiresAt, new Date())))).orderBy(desc(s.announcements.priority), desc(s.announcements.publishedAt)).limit(1)), undefined);
 export const announcementsList = safe(() => db.select().from(s.announcements).where(and(eq(s.announcements.status, "published"),
   or(isNull(s.announcements.expiresAt), gte(s.announcements.expiresAt, new Date())))).orderBy(desc(s.announcements.publishedAt)), []);
-export const announcementBySlug = safe(async (slug: string) => first(await db.select().from(s.announcements).where(and(eq(s.announcements.slug, slug), eq(s.announcements.status, "published")))), undefined);
+export const announcementBySlug = safe(async (slug: string, preview: boolean = false) => first(await db.select().from(s.announcements).where(and(eq(s.announcements.slug, slug), preview ? undefined : eq(s.announcements.status, "published")))), undefined);
 
 // ---- Gallery / media ----
 export const albums = safe((opts: { year?: number; limit?: number } = {}) =>
@@ -107,10 +107,28 @@ export const albums = safe((opts: { year?: number; limit?: number } = {}) =>
     .orderBy(desc(s.galleryAlbums.isFeatured), desc(s.galleryAlbums.albumDate), desc(s.galleryAlbums.createdAt)).limit(opts.limit ?? 100), []);
 export const albumYears = safe(async () => (await db.selectDistinct({ y: s.galleryAlbums.year }).from(s.galleryAlbums)
   .where(and(eq(s.galleryAlbums.status, "published"), isNotNull(s.galleryAlbums.year))).orderBy(desc(s.galleryAlbums.year))).map((r) => r.y as number), [] as number[]);
-export const albumBySlug = safe(async (slug: string) => first(await db.select().from(s.galleryAlbums).where(and(eq(s.galleryAlbums.slug, slug), eq(s.galleryAlbums.status, "published")))), undefined);
+export const albumBySlug = safe(async (slug: string, preview: boolean = false) => first(await db.select().from(s.galleryAlbums).where(and(eq(s.galleryAlbums.slug, slug), preview ? undefined : eq(s.galleryAlbums.status, "published")))), undefined);
 export const albumImages = safe((albumId: string) => db.select().from(s.galleryImages).where(eq(s.galleryImages.albumId, albumId)).orderBy(asc(s.galleryImages.displayOrder)), []);
 /** Photos for the home page "Life & Culture" strip: newest images from published albums. */
 export const recentPhotos = safe((limit: number = 12) =>
   db.select({ img: s.galleryImages, album: s.galleryAlbums.title }).from(s.galleryImages)
     .innerJoin(s.galleryAlbums, eq(s.galleryImages.albumId, s.galleryAlbums.id))
     .where(eq(s.galleryAlbums.status, "published")).orderBy(desc(s.galleryImages.createdAt)).limit(limit), []);
+
+// ---- Videos ----
+export const publishedVideos = safe((limit: number = 60) =>
+  db.select().from(s.videos).where(eq(s.videos.status, "published")).orderBy(asc(s.videos.displayOrder), desc(s.videos.createdAt)).limit(limit), []);
+
+// ---- Search ----
+const like = (term: string) => `%${term.replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
+export const searchSite = safe(async (term: string) => {
+  const pat = like(term);
+  const [newsR, projectsR, eventsR, execsR, committeesR] = await Promise.all([
+    db.select().from(s.news).where(and(live(), or(ilike(s.news.title, pat), ilike(s.news.excerpt, pat), ilike(s.news.content, pat)))).orderBy(desc(s.news.publishedAt)).limit(8),
+    db.select().from(s.projects).where(and(eq(s.projects.publishStatus, "published"), or(ilike(s.projects.title, pat), ilike(s.projects.summary, pat), ilike(s.projects.content, pat)))).limit(8),
+    db.select().from(s.events).where(and(eq(s.events.status, "published"), or(ilike(s.events.title, pat), ilike(s.events.description, pat), ilike(s.events.venue, pat)))).orderBy(desc(s.events.startsAt)).limit(8),
+    db.select().from(s.executives).where(and(eq(s.executives.isActive, true), or(ilike(s.executives.fullName, pat), ilike(s.executives.position, pat), ilike(s.executives.programme, pat)))).limit(8),
+    db.select().from(s.committees).where(and(eq(s.committees.isActive, true), eq(s.committees.kind, "committee"), or(ilike(s.committees.name, pat), ilike(s.committees.description, pat)))).limit(8),
+  ]);
+  return { news: newsR, projects: projectsR, events: eventsR, executives: execsR, committees: committeesR };
+}, { news: [], projects: [], events: [], executives: [], committees: [] } as any);

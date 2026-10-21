@@ -32,6 +32,7 @@ export default async function ListPage({ params, searchParams }: { params: Promi
           <tbody>{rows.map((row: any) => (
             <tr key={row.id} className="border-t border-black/5">{r.cols.map((c) => <td key={c} className="p-3">{show(row[c])}</td>)}
               <td className="whitespace-nowrap p-3"><div className="flex items-center gap-3"><Link href={`/admin/${resource}/${row.id}`} className="text-emerald">Edit</Link>
+                {r.preview && row.slug && <Link href={`${r.preview}${row.slug}?preview=1`} target="_blank" className="text-black/60 hover:text-emerald">Preview ↗</Link>}
                 {resource === "gallery" && <Link href={`/admin/gallery-images/${row.id}`} className="font-semibold text-emerald">Photos</Link>}
                 <DeleteButton action={remove.bind(null, resource, row.id)} /></div></td></tr>))}</tbody>
         </table></div>)}

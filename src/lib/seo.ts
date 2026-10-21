@@ -1,4 +1,5 @@
 export type SlugP = { params: Promise<{ slug: string }> };
+export type SlugPreviewP = SlugP & { searchParams: Promise<{ preview?: string }> };
 export const meta = (title: string, description?: string | null, img?: { url: string } | null) => ({
   title,
   description: description?.slice(0, 160) ?? undefined,

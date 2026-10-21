@@ -7,7 +7,7 @@ export type Field = {
 };
 export type Resource = {
   key: string; label: string; group: string; table: any; perm: string;
-  slugFrom?: string; titleCol: string; cols: string[]; fields: Field[]; orderBy?: string;
+  slugFrom?: string; titleCol: string; cols: string[]; fields: Field[]; orderBy?: string; preview?: string;
 };
 
 const t = (name: string, label: string, required = false, help?: string): Field => ({ name, label, type: "text", required, help });
@@ -39,18 +39,20 @@ const LIST: Resource[] = [
     fields: [t("fullName", "Full name", true), ref("committeeId", "Committee / Judicial / NUGS group", s.committees, "name", true), t("role", "Role"), area("bio", "Biography"), img("profileImage", "Photo", "committees"), order, bool("isActive", "Active")] },
 
   // ---- Content ----
-  { key: "news", label: "News", group: "Content", table: s.news, perm: "news:write", slugFrom: "title", titleCol: "title", cols: ["title", "category", "status", "publishedAt"],
+  { key: "news", preview: "/news/", label: "News", group: "Content", table: s.news, perm: "news:write", slugFrom: "title", titleCol: "title", cols: ["title", "category", "status", "publishedAt"],
     fields: [t("title", "Title", true), sel("category", "Category", ["news", "announcement", "press"]), t("excerpt", "Short excerpt"), area("content", "Content", true, FORMAT), img("coverImage", "Cover image", "news"),
       t("author", "Author"), bool("isFeatured", "Featured"), status, dt("publishedAt", "Published at")] },
-  { key: "projects", label: "Projects", group: "Content", table: s.projects, perm: "projects:write", slugFrom: "title", titleCol: "title", cols: ["title", "status", "year", "publishStatus"],
+  { key: "projects", preview: "/projects/", label: "Projects", group: "Content", table: s.projects, perm: "projects:write", slugFrom: "title", titleCol: "title", cols: ["title", "status", "year", "publishStatus"],
     fields: [t("title", "Title", true), t("summary", "Summary"), area("content", "Details", false, FORMAT), img("coverImage", "Cover image", "projects"), sel("status", "Project status", ["planned", "ongoing", "completed"]), t("year", "Year / session"),
       bool("isFeatured", "Featured"), sel("publishStatus", "Publish status", ["draft", "published"])] },
-  { key: "events", label: "Events", group: "Content", table: s.events, perm: "events:write", slugFrom: "title", titleCol: "title", cols: ["title", "startsAt", "venue", "status"],
+  { key: "events", preview: "/events/", label: "Events", group: "Content", table: s.events, perm: "events:write", slugFrom: "title", titleCol: "title", cols: ["title", "startsAt", "venue", "status"],
     fields: [t("title", "Title", true), area("description", "Description", false, FORMAT), dt("startsAt", "Starts", true), dt("endsAt", "Ends"), t("venue", "Venue"), img("coverImage", "Cover image", "events"), bool("isFeatured", "Featured"), status] },
-  { key: "announcements", label: "Announcements", group: "Content", table: s.announcements, perm: "announcements:write", slugFrom: "title", titleCol: "title", cols: ["title", "priority", "status", "expiresAt"],
+  { key: "announcements", preview: "/announcements/", label: "Announcements", group: "Content", table: s.announcements, perm: "announcements:write", slugFrom: "title", titleCol: "title", cols: ["title", "priority", "status", "expiresAt"],
     fields: [t("title", "Title", true), area("description", "Description", true), img("flyer", "Flyer", "news"), sel("priority", "Priority", ["low", "normal", "high", "urgent"]), dt("publishedAt", "Publish date"), dt("expiresAt", "Expiry date"), status] },
-  { key: "gallery", label: "Media Albums", group: "Content", table: s.galleryAlbums, perm: "gallery:write", slugFrom: "title", titleCol: "title", cols: ["title", "year", "isFeatured", "status"],
+  { key: "gallery", preview: "/media/", label: "Media Albums", group: "Content", table: s.galleryAlbums, perm: "gallery:write", slugFrom: "title", titleCol: "title", cols: ["title", "year", "isFeatured", "status"],
     fields: [t("title", "Title", true), area("description", "Description"), num("year", "Year"), { name: "albumDate", label: "Date", type: "date" }, img("coverImage", "Cover image", "gallery"), bool("isFeatured", "Featured"), status] },
+  { key: "videos", label: "Videos (YouTube)", group: "Content", table: s.videos, perm: "gallery:write", titleCol: "title", orderBy: "displayOrder", cols: ["title", "status", "displayOrder"],
+    fields: [t("title", "Title", true), t("url", "YouTube link", true, "Paste any YouTube link: watch, youtu.be, shorts or embed."), area("description", "Description"), order, bool("isFeatured", "Featured"), status] },
   { key: "pages", label: "Pages (About, Constitution…)", group: "Content", table: s.pages, perm: "pages:write", titleCol: "title", cols: ["pageKey", "title"],
     fields: [sel("pageKey", "Page", PAGE_KEYS), t("title", "Title", true), t("subtitle", "Subtitle"), area("body", "Body", true, FORMAT), img("image", "Side image", "pages"), t("ctaLabel", "Button label"), t("ctaHref", "Button link (e.g. constitution PDF)")] },
   { key: "documents", label: "Documents & Links", group: "Content", table: s.documents, perm: "documents:write", titleCol: "title", orderBy: "displayOrder", cols: ["title", "category", "isActive", "displayOrder"],

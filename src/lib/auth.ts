@@ -47,6 +47,6 @@ export const getSession = cache(async () => {
 export async function requireAdmin(permission?: string) {
   const s = await getSession();
   if (!s) redirect("/admin/login");
-  if (permission && !can(s.permissions, permission)) throw new Error("FORBIDDEN");
+  if (permission && !can(s.permissions, permission)) redirect("/admin/dashboard?denied=1");
   return s;
 }

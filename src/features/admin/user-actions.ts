@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { users, roles } from "@/db/schema";
 import { requireAdmin, hashPassword, verifyPassword, createSession } from "@/lib/auth";
+import { audit } from "@/lib/audit";
 
 type State = { error?: string; ok?: string } | undefined;
 const password = z.string().min(12, "Password must be at least 12 characters").max(100);
@@ -19,13 +20,14 @@ async function otherActiveSuperAdmins(excludeId: string) {
 }
 
 export async function createUser(_: State, fd: FormData): Promise<State> {
-  await requireAdmin("users:write");
+  const me = await requireAdmin("users:write");
   const p = z.object({ name: z.string().trim().min(2).max(100), email: z.string().trim().email().toLowerCase(), roleId: uuid, password })
     .safeParse(Object.fromEntries(fd));
   if (!p.success) return { error: p.error.issues[0].message };
   try {
     await db.insert(users).values({ name: p.data.name, email: p.data.email, roleId: p.data.roleId, passwordHash: await hashPassword(p.data.password) });
   } catch { return { error: "That email is already in use." }; }
+  await audit(me, "created", "user", p.data.email);
   revalidatePath("/admin/users");
   redirect("/admin/users?created=1");
 }
@@ -50,6 +52,7 @@ export async function updateUser(id: string, _: State, fd: FormData): Promise<St
     set.passwordHash = await hashPassword(pw.data);
   }
   await db.update(users).set(set).where(eq(users.id, id));
+  await audit(me, p.data.newPassword ? "updated + reset password" : "updated", "user", p.data.name, id);
   revalidatePath("/admin/users");
   redirect("/admin/users?saved=1");
 }
@@ -61,6 +64,7 @@ export async function deleteUser(id: string) {
   const [target] = await db.select({ roleKey: roles.key }).from(users).innerJoin(roles, eq(users.roleId, roles.id)).where(eq(users.id, id));
   if (target?.roleKey === "super_admin" && (await otherActiveSuperAdmins(id)) === 0) return;
   await db.delete(users).where(eq(users.id, id));
+  await audit(me, "deleted", "user", id, id);
   revalidatePath("/admin/users");
   redirect("/admin/users?deleted=1");
 }

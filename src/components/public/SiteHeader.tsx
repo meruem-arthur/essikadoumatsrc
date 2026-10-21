@@ -39,8 +39,12 @@ export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl }:
             ) : <Link key={n.href} href={n.href} className="text-glow link-underline hover:text-goldlight">{n.label}</Link>)}
             {sportsUrl && <a href={sportsUrl} target="_blank" rel="noopener noreferrer" className="rounded-sm bg-gold px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink hover:bg-goldlight">SRC Sports ↗</a>}
           </nav>
+          <div className="flex items-center gap-1">
+          <Link href="/search" aria-label="Search the site" className="flex h-9 w-9 items-center justify-center rounded-full hover:text-goldlight">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg></Link>
           <button type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)} className="flex h-9 w-9 flex-col items-center justify-center gap-[5px] xl:hidden">
             <span className="block h-px w-6 bg-current" /><span className="block h-px w-6 bg-current" /></button>
+          </div>
         </div>
       </div>
       {open && (

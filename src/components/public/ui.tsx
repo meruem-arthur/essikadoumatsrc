@@ -81,3 +81,8 @@ export function Rich({ text, className = "" }: { text: string; className?: strin
 export const LinkButton = ({ href, children, ghost }: { href: string; children: React.ReactNode; ghost?: boolean }) => (
   <Link href={href} className={ghost ? "inline-block rounded-sm border border-current px-6 py-3 text-sm font-bold uppercase tracking-wide hover:text-gold" : "inline-block rounded-sm bg-gold px-6 py-3 text-sm font-bold uppercase tracking-wide text-ink hover:bg-goldlight"}>{children}</Link>
 );
+
+/** Shown only when an admin opens ?preview=1; tells them the page may be a draft. */
+export const PreviewBanner = () => (
+  <div className="fixed inset-x-0 bottom-0 z-50 bg-gold px-4 py-2 text-center text-sm font-bold text-ink">Admin preview. Drafts are visible here but not to the public.</div>
+);

@@ -28,6 +28,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           })}
           {can(s.permissions, "settings:write") && <Link href="/admin/settings" className={link}>Settings</Link>}
           {can(s.permissions, "users:write") && <Link href="/admin/users" className={link}>Admin Users</Link>}
+          {can(s.permissions, "activity:read") && <Link href="/admin/activity" className={link}>Activity log</Link>}
           <Link href="/admin/account" className={link}>My account</Link>
           <Link href="/" target="_blank" className={`${link} opacity-70`}>View site ↗</Link>
         </nav>
