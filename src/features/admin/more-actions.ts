@@ -76,7 +76,7 @@ export async function captionImage(id: string, fd: FormData) {
   done();
 }
 
-const KEYS = ["site_name", "tagline", "campus", "contact_email", "phone", "po_box", "address", "office_hours", "footer_text", "sports_url", "portal_url", "map_url"] as const;
+const KEYS = ["site_name", "tagline", "campus", "contact_email", "phone", "po_box", "address", "office_hours", "footer_text", "sports_url", "railers_url", "portal_url", "map_url"] as const;
 const SOCIALS = ["facebook", "instagram", "x", "youtube", "tiktok", "whatsapp"] as const;
 export async function saveSettings(fd: FormData) {
   const me = await requireAdmin("settings:write");

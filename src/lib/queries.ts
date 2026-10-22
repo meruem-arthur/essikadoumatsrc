@@ -41,6 +41,7 @@ export const getSettings = safe(async () => {
     hours: m.office_hours as string | undefined,
     footer: m.footer_text as string | undefined,
     sportsUrl: m.sports_url as string | undefined,
+    railersUrl: m.railers_url as string | undefined,
     portalUrl: m.portal_url as string | undefined,
     mapUrl: m.map_url as string | undefined,
     socials: (m.socials ?? {}) as Record<string, string>,

@@ -33,8 +33,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const all = links.length ? links : DEFAULT_LINKS;
   const groups = [...new Set(all.map((l) => l.groupName))];
   const isExternal = (u: string) => /^https?:\/\//.test(u);
+  // Sister sites. Addresses are editable in Admin → Settings; these are the production defaults.
+  const sportsHref = st.sportsUrl || "https://sports.umatsridsrc.com";
+  const railersHref = st.railersUrl || "https://railers.umatsridsrc.com";
+  const network = [{ key: "src", label: "UMaT SRC", href: "/" }, { key: "sports", label: "SRC Sports", href: sportsHref }, { key: "railers", label: "SRID Railers", href: railersHref }];
   return (<>
-    <SiteHeader name={st.siteName} logo={logo} nav={NAV} sidebarImage={st.sidebarImage?.url} sportsUrl={st.sportsUrl} />
+    <SiteHeader name={st.siteName} logo={logo} nav={NAV} sidebarImage={st.sidebarImage?.url} sportsUrl={st.sportsUrl} network={network} />
     <main>{children}</main>
     <footer className="bg-forest py-14 text-chalk">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-4">
@@ -54,7 +58,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             <ul className="space-y-1.5 text-sm opacity-80">{all.filter((l) => l.groupName === g).map((l) => (
               <li key={l.id}>{isExternal(l.url) ? <a href={l.url} target="_blank" rel="noopener noreferrer" className="hover:text-goldlight">{l.label} ↗</a> : <Link href={l.url} className="hover:text-goldlight">{l.label}</Link>}</li>))}
               {g === groups[0] && st.portalUrl && <li><a href={st.portalUrl} target="_blank" rel="noopener noreferrer" className="hover:text-goldlight">Student Portal ↗</a></li>}
-              {g === groups[0] && st.sportsUrl && <li><a href={st.sportsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-goldlight">SRC Sports ↗</a></li>}</ul></div>))}
+              {g === groups[0] && st.sportsUrl && <li><a href={st.sportsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-goldlight">SRC Sports ↗</a></li>}
+              {g === groups[0] && <li><a href={railersHref} target="_blank" rel="noopener noreferrer" className="hover:text-goldlight">SRID Railers ↗</a></li>}</ul></div>))}
         <div><p className="mb-3 text-xs tracking-[.28em] text-goldlight">GET IN TOUCH</p>
           <ul className="space-y-1.5 text-sm opacity-80">
             {st.poBox && <li>{st.poBox}</li>}{st.address && <li>{st.address}</li>}

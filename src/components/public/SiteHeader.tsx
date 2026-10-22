@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import NetworkBar, { type NetworkItem } from "./NetworkBar";
 
 export type NavItem = { label: string; href: string; children?: { label: string; href: string }[] };
 
-export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl }:
-  { name: string; logo: string; nav: NavItem[]; sidebarImage?: string; sportsUrl?: string }) {
+export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl, network = [] }:
+  { name: string; logo: string; nav: NavItem[]; sidebarImage?: string; sportsUrl?: string; network?: NetworkItem[] }) {
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
   const path = usePathname();
@@ -21,6 +22,7 @@ export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl }:
     <header className="fixed inset-x-0 top-0 z-40 text-chalk">
       <div className={`pointer-events-none absolute inset-0 scrim-top transition-opacity duration-300 ${solid ? "opacity-0" : "opacity-100"}`} aria-hidden />
       <div className={`relative border-b transition-all duration-300 ${solid ? "border-white/10 bg-forest/95 backdrop-blur-md" : "border-transparent bg-transparent"}`}>
+        {!solid && network.length > 0 && <NetworkBar items={network} current="src" />}
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2.5">
             <Image src="/umat-logo.jpg" alt="UMaT" width={36} height={44} className="h-9 w-auto shrink-0 rounded bg-white p-0.5" priority />

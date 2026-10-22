@@ -10,7 +10,7 @@ export default async function Page() {
   const text: [string, string, string | undefined][] = [
     ["site_name", "Site name", st.siteName], ["tagline", "Tagline", st.tagline], ["campus", "Campus name", st.campus], ["contact_email", "Contact email", st.email], ["phone", "Phone", st.phone],
     ["po_box", "P.O. Box", st.poBox], ["address", "Address", st.address], ["office_hours", "Office hours", st.hours], ["footer_text", "Footer text", st.footer],
-    ["map_url", "Map link (Google Maps URL)", st.mapUrl], ["portal_url", "Student portal URL", st.portalUrl], ["sports_url", "SRC Sports site URL", st.sportsUrl]];
+    ["map_url", "Map link (Google Maps URL)", st.mapUrl], ["portal_url", "Student portal URL", st.portalUrl], ["sports_url", "SRC Sports site URL (e.g. https://sports.umatsridsrc.com)", st.sportsUrl], ["railers_url", "Railers basketball site URL (e.g. https://railers.umatsridsrc.com)", st.railersUrl]];
   return (<div className="space-y-4"><h1 className="display text-4xl">Settings</h1>
     <form action={saveSettings} className="max-w-2xl space-y-4 rounded-xl bg-white p-6 shadow-sm">
       {text.map(([k, l, v]) => <label key={k} className={L}>{l}<input name={k} defaultValue={v ?? ""} required={k === "site_name"} className={c} /></label>)}

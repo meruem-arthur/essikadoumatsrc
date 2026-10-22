@@ -48,6 +48,9 @@ After pulling this update run `npm run db:generate && npm run db:migrate` (new t
 - **Secretariat / Media Team**: optional limited roles for helpers.
 Flow: the Super Admin signs in → Admin Users → adds each admin with a temporary password → the admin signs in and changes it under My account (or uses Forgot password).
 
+## Sister sites
+A thin bar (UMaT SRC · SRC Sports · SRID Railers) shows at the top of every page, with matching footer links. Addresses are managed in **Admin → Settings** (SRC Sports site URL, Railers basketball site URL); if left empty they default to `https://sports.umatsridsrc.com` and `https://railers.umatsridsrc.com`.
+
 ## Admin notes
 - **Forgot password:** `/admin/forgot-password` emails a single-use link (30 min). Needs `RESEND_API_KEY` + `MAIL_FROM` (verify your domain in Resend). Without them, local dev prints the link in the terminal and production refuses to send. After pulling this update run `npm run db:generate && npm run db:migrate` (new `password_resets` table).
 - Admin lives at `/admin` on whatever domain you attach in Vercel (e.g. `essikadoumatsrc.com/admin`). Set `NEXT_PUBLIC_SITE_URL` to that domain.
