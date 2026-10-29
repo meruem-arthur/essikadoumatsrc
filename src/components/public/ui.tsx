@@ -19,19 +19,33 @@ export function Section({ n, title, href, hrefLabel = "See all →", children, d
   );
 }
 
-/** Page banner. The photo (managed in Admin → Page Heroes, keyed by `pageKey`) stays clear; copy sits on the translucent hero panel. */
+/**
+ * Page banner (same behaviour as the main-campus site). With an admin-set photo (Admin → Page Banners, keyed by `pageKey`),
+ * list/content pages get a full-screen banner: photo fills the first screen, title centred with a "HOME › PAGE" trail,
+ * and the page scrolls up over it. Detail pages (no `pageKey`) get a shorter banner. Without a photo it stays compact.
+ */
 export async function PageHeader({ pageKey, title, sub, image }: { pageKey?: string; title: string; sub?: string | null; image?: Img | null }) {
   const h = pageKey ? await pageHero(pageKey) : undefined;
   const img = h?.image ?? image;
+  const heading = h?.title ?? title;
+  const subtitle = h?.subtitle ?? sub;
+  const section = !!pageKey;
+  const size = !img ? "min-h-[300px] items-end pb-12 pt-32" : section ? "min-h-[100svh] items-center pb-20 pt-28" : "min-h-[60svh] items-center pb-12 pt-32";
   return (
-    <header className={`relative flex items-end overflow-hidden bg-forest pb-12 pt-32 text-chalk ${img ? "min-h-[56svh]" : "min-h-[300px]"}`}>
-      {img && <><Photo img={img} priority sizes="100vw" className="absolute inset-0" /><div className="scrim-top absolute inset-0" /></>}
-      <div className="relative mx-auto w-full max-w-6xl px-4">
-        <div className="hero-panel inline-block max-w-2xl px-6 py-6 md:px-9 md:py-8">
-          <h1 className="display text-glow break-words text-4xl sm:text-5xl md:text-7xl">{h?.title ?? title}</h1>
-          {(h?.subtitle ?? sub) && <p className="mt-3 max-w-xl text-lg opacity-95">{h?.subtitle ?? sub}</p>}
-        </div>
+    <header className={`relative flex justify-center overflow-hidden bg-forest px-4 text-center text-chalk ${size}`}>
+      {img && <>
+        <Photo img={img} priority sizes="100vw" className="absolute inset-0" />
+        <div className="absolute inset-0 bg-black/40" /><div className="scrim-top absolute inset-0" /><div className="scrim-bottom absolute inset-0" />
+      </>}
+      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center">
+        <h1 className="display text-glow break-words text-5xl sm:text-6xl md:text-8xl">{heading}</h1>
+        {subtitle && <p className="text-glow mt-4 max-w-2xl text-lg md:text-xl">{subtitle}</p>}
+        {section && img && (
+          <nav aria-label="Breadcrumb" className="text-glow mt-6 flex items-center gap-2 text-xs font-semibold tracking-[.2em] sm:text-sm">
+            <Link href="/" className="text-goldlight hover:underline">HOME</Link><span aria-hidden>›</span><span>{heading.toUpperCase()}</span>
+          </nav>)}
       </div>
+      {section && img && <span aria-hidden className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] tracking-[.3em] text-white/70">SCROLL ↓</span>}
     </header>
   );
 }
