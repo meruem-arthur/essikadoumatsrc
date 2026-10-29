@@ -30,8 +30,8 @@ img { max-width: 100%; height: auto; }
 /* Gentler top bias for hero/banner photos so tall mobile screens don't crop aggressively. */
 .object-portrait-soft { object-position: 50% 28%; }
 /* Light top scrim so the fixed header stays legible over bright photos. */
-.scrim-top { background: linear-gradient(to bottom, rgba(8,36,23,.6) 0%, rgba(8,36,23,.22) 45%, rgba(8,36,23,0) 100%); }
-.scrim-bottom { background: linear-gradient(to top, rgba(8,36,23,.62) 0%, rgba(8,36,23,.2) 50%, rgba(8,36,23,0) 100%); }
+.scrim-top { background: linear-gradient(to bottom, rgba(0,0,0,.5) 0%, rgba(0,0,0,.16) 45%, rgba(0,0,0,0) 100%); }
+.scrim-bottom { background: linear-gradient(to top, rgba(0,0,0,.5) 0%, rgba(0,0,0,.14) 50%, rgba(0,0,0,0) 100%); }
 .text-glow { text-shadow: 0 0 26px rgba(0,0,0,.85), 0 0 10px rgba(0,0,0,.75), 0 3px 14px rgba(0,0,0,.7); }
 /* Translucent panel behind hero copy so the photo itself stays clear and undimmed. */
 .hero-panel {

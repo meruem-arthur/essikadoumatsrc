@@ -11,23 +11,30 @@ const AUTOPLAY_MS = 6000;
 /**
  * Full-width slideshow. Copy is centred over the photo (same layout as the main-campus site):
  * heading, description, then buttons. A soft even shade keeps the text readable while the photo stays visible.
- * Arrows, dots, swipe and keyboard-focusable controls; autoplay pauses on hover/focus and for reduced-motion users.
+ * Arrows, dots, swipe, and a pause/play button. Autoplay keeps going until a visitor presses pause. The outgoing photo stays opaque under the incoming one, so nothing shows through mid-fade.
  */
 export default function HeroSlider({ slides, eyebrow }: { slides: Slide[]; eyebrow: string }) {
-  const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  const [st, setSt] = useState<{ i: number; prev: number | null }>({ i: 0, prev: null });
+  const [playing, setPlaying] = useState(true);
   const startX = useRef<number | null>(null);
   const n = slides.length;
+  const i = st.i;
 
-  const go = useCallback((dir: number) => setI((x) => (x + dir + n) % n), [n]);
+  const go = useCallback((dir: number) => setSt((x) => ({ i: (x.i + dir + n) % n, prev: x.i })), [n]);
+  const goTo = useCallback((k: number) => setSt((x) => (k === x.i ? x : { i: k, prev: x.i })), []);
 
-  useEffect(() => { setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches); }, []);
+  // Once the fade has finished, the old slide can be hidden for good.
   useEffect(() => {
-    if (n < 2 || paused || reduced) return;
+    if (st.prev === null) return;
+    const t = setTimeout(() => setSt((x) => ({ ...x, prev: null })), 1500);
+    return () => clearTimeout(t);
+  }, [st]);
+  // Autoplay. The timer restarts after every change (manual or automatic) so a click never causes a double-jump.
+  useEffect(() => {
+    if (n < 2 || !playing) return;
     const t = setInterval(() => go(1), AUTOPLAY_MS);
     return () => clearInterval(t);
-  }, [n, paused, reduced, go]);
+  }, [n, playing, go, st.i]);
 
   const s = slides[i];
   const arrow = "absolute top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-2xl text-white backdrop-blur-sm transition hover:border-gold hover:bg-black/50 hover:text-goldlight sm:flex";
@@ -35,9 +42,7 @@ export default function HeroSlider({ slides, eyebrow }: { slides: Slide[]; eyebr
   return (
     <section
       aria-roledescription="carousel" aria-label="Featured"
-      className="relative h-[88svh] max-h-[820px] min-h-[560px] overflow-hidden bg-forest text-chalk"
-      onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)} onBlurCapture={() => setPaused(false)}
+      className="relative h-[88svh] max-h-[820px] min-h-[560px] overflow-hidden bg-black text-chalk"
       onPointerDown={(e) => { startX.current = e.clientX; }}
       onPointerUp={(e) => {
         if (startX.current !== null && n > 1) { const dx = e.clientX - startX.current; if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1); }
@@ -47,11 +52,12 @@ export default function HeroSlider({ slides, eyebrow }: { slides: Slide[]; eyebr
       <div className="absolute inset-0" aria-hidden>
         {slides.map((sl, k) => (
           <Image key={sl.id} src={sl.image.url} alt="" fill priority={k === 0} sizes="100vw"
-            className="object-cover object-portrait-soft transition-opacity duration-[1400ms]" style={{ opacity: k === i ? 1 : 0 }} />))}
-        {/* even shade for text legibility + a darker top so the header stays readable */}
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="scrim-top absolute inset-0" />
-        <div className="scrim-bottom absolute inset-0" />
+            className="object-cover object-portrait-soft transition-opacity duration-[1400ms]"
+            style={{ opacity: k === i || k === st.prev ? 1 : 0, zIndex: k === i ? 2 : k === st.prev ? 1 : 0 }} />))}
+        {/* light, neutral shade for text legibility (no colour cast) */}
+        <div className="absolute inset-0 z-[3] bg-black/20" />
+        <div className="scrim-top absolute inset-0 z-[3]" />
+        <div className="scrim-bottom absolute inset-0 z-[3]" />
       </div>
 
       {/* pt clears the fixed header (network bar + nav); content is centred in the space that's left */}
@@ -74,8 +80,10 @@ export default function HeroSlider({ slides, eyebrow }: { slides: Slide[]; eyebr
         <button type="button" onClick={() => go(1)} aria-label="Next slide" className={`${arrow} right-4 lg:right-8`}>›</button>
         <div className="absolute inset-x-0 bottom-6 z-10 flex items-center justify-center gap-2">
           {slides.map((sl, k) => (
-            <button key={sl.id} type="button" aria-label={`Go to slide ${k + 1}`} aria-current={k === i} onClick={() => setI(k)}
+            <button key={sl.id} type="button" aria-label={`Go to slide ${k + 1}`} aria-current={k === i} onClick={() => goTo(k)}
               className="h-[3px] transition-all duration-300" style={{ width: k === i ? 32 : 14, background: k === i ? "var(--color-gold)" : "rgba(246,245,239,.45)" }} />))}
+          <button type="button" onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause slideshow" : "Play slideshow"}
+            className="ml-3 grid h-7 w-7 place-items-center rounded-full border border-white/40 text-[10px] text-white hover:border-gold hover:text-goldlight">{playing ? "❚❚" : "▶"}</button>
         </div>
       </>}
     </section>

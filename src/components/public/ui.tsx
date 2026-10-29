@@ -35,7 +35,7 @@ export async function PageHeader({ pageKey, title, sub, image }: { pageKey?: str
     <header className={`relative flex justify-center overflow-hidden bg-forest px-4 text-center text-chalk ${size}`}>
       {img && <>
         <Photo img={img} priority sizes="100vw" className="absolute inset-0" />
-        <div className="absolute inset-0 bg-black/40" /><div className="scrim-top absolute inset-0" /><div className="scrim-bottom absolute inset-0" />
+        <div className="absolute inset-0 bg-black/25" /><div className="scrim-top absolute inset-0" /><div className="scrim-bottom absolute inset-0" />
       </>}
       <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center">
         <h1 className="display text-glow break-words text-5xl sm:text-6xl md:text-8xl">{heading}</h1>
