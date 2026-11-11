@@ -23,10 +23,10 @@ export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl, n
       <div className={`pointer-events-none absolute inset-0 scrim-top transition-opacity duration-300 ${solid ? "opacity-0" : "opacity-100"}`} aria-hidden />
       <div className={`relative border-b transition-all duration-300 ${solid ? "border-white/10 bg-black/35 backdrop-blur-md" : "border-transparent bg-transparent"}`}>
         {!solid && network.length > 0 && <NetworkBar items={network} current="src" />}
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1.5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1">
           <Link href="/" className="flex min-w-0 items-center gap-2.5">
-            <Image src="/umat-logo.jpg" alt="UMaT" width={36} height={44} className="h-7 w-auto shrink-0 rounded bg-white p-0.5" priority />
-            <Image src={logo} alt="SRC" width={40} height={40} className="h-8 w-8 shrink-0 rounded-full bg-white" priority />
+            <Image src="/umat-logo.jpg" alt="UMaT" width={36} height={44} className="shrink-0 rounded bg-white p-0.5" style={{ height: 28, width: "auto" }} priority />
+            <Image src={logo} alt="SRC" width={40} height={40} className="shrink-0 rounded-full bg-white" style={{ height: 28, width: 28 }} priority />
             <span className="hidden min-w-0 flex-col leading-none min-[460px]:flex">
               <span className="display text-glow truncate text-base md:text-lg">{name}</span>
               <span className="text-glow mt-0.5 text-[8px] tracking-[.26em] opacity-80">ESSIKADO CAMPUS</span></span>
@@ -34,7 +34,7 @@ export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl, n
           <nav className="hidden items-center gap-4 text-[12px] font-semibold xl:flex">
             {nav.map((n) => n.children ? (
               <div key={n.label} className="group relative">
-                <button type="button" className="text-glow link-underline flex items-center gap-1 py-1 hover:text-goldlight">{n.label}<span className="text-[9px]">▾</span></button>
+                <button type="button" className="text-glow link-underline flex items-center gap-1 py-0.5 hover:text-goldlight">{n.label}<span className="text-[9px]">▾</span></button>
                 <div className="invisible absolute left-0 top-full min-w-52 rounded-md bg-forest p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                   {n.children.map((c) => <Link key={c.href} href={c.href} className="block rounded px-3 py-2 hover:bg-white/10 hover:text-goldlight">{c.label}</Link>)}</div>
               </div>
@@ -42,9 +42,9 @@ export default function SiteHeader({ name, logo, nav, sidebarImage, sportsUrl, n
             {sportsUrl && <a href={sportsUrl} target="_blank" rel="noopener noreferrer" className="rounded-sm bg-gold px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-ink hover:bg-goldlight">SRC Sports ↗</a>}
           </nav>
           <div className="flex items-center gap-1">
-          <Link href="/search" aria-label="Search the site" className="flex h-8 w-8 items-center justify-center rounded-full hover:text-goldlight">
+          <Link href="/search" aria-label="Search the site" className="flex h-7 w-7 items-center justify-center rounded-full hover:text-goldlight">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg></Link>
-          <button type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)} className="flex h-8 w-8 flex-col items-center justify-center gap-[5px] xl:hidden">
+          <button type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)} className="flex h-7 w-7 flex-col items-center justify-center gap-[5px] xl:hidden">
             <span className="block h-px w-6 bg-current" /><span className="block h-px w-6 bg-current" /></button>
           </div>
         </div>
