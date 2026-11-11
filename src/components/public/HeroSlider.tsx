@@ -60,8 +60,8 @@ export default function HeroSlider({ slides, eyebrow }: { slides: Slide[]; eyebr
         <div className="scrim-bottom absolute inset-0 z-[3]" />
       </div>
 
-      {/* pt clears the fixed header (network bar + nav); content is centred in the space that's left */}
-      <div className="relative flex h-full flex-col items-center justify-center px-4 pb-16 pt-32 text-center sm:pb-20 sm:pt-36">
+      {/* z-[4] keeps the copy above the photos and shades (z 0-3); pt clears the fixed header */}
+      <div className="relative z-[4] flex h-full flex-col items-center justify-center px-4 pb-16 pt-24 text-center sm:pb-20 sm:pt-28">
         <div key={s.id} className="hero-fade mx-auto flex max-w-4xl flex-col items-center">
           <p className="mb-4 flex items-center gap-3 text-[11px] font-semibold tracking-[.24em] text-goldlight sm:text-xs">
             <span className="h-px w-6 bg-gold" />{eyebrow.toUpperCase()}<span className="h-px w-6 bg-gold" /></p>
