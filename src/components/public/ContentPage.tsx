@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pageByKey } from "@/lib/queries";
-import { PageHeader, Photo, Rich, Wrap, Empty } from "./ui";
+import { PageHeader, Rich, Wrap, Empty } from "./ui";
+import ZoomPhoto from "./ZoomPhoto";
 
 /** Renders an admin-editable long-form page (Admin → Pages) under a page banner. */
 export default async function ContentPage({ pageKey, title, sub, children }: { pageKey: string; title: string; sub?: string; children?: React.ReactNode }) {
@@ -13,7 +14,7 @@ export default async function ContentPage({ pageKey, title, sub, children }: { p
           {p.ctaLabel && p.ctaHref && (/^https?:/.test(p.ctaHref)
             ? <a href={p.ctaHref} target="_blank" rel="noopener noreferrer" className="mt-8 inline-block rounded-sm bg-gold px-6 py-3 text-sm font-bold uppercase tracking-wide text-ink hover:bg-goldlight">{p.ctaLabel} ↗</a>
             : <Link href={p.ctaHref} className="mt-8 inline-block rounded-sm bg-gold px-6 py-3 text-sm font-bold uppercase tracking-wide text-ink hover:bg-goldlight">{p.ctaLabel} →</Link>)}</div>
-        {p.image && <Photo img={p.image} alt={p.title} sizes="(min-width:768px) 40vw, 100vw" className="aspect-[4/5] rounded-2xl" />}
+        {p.image && <ZoomPhoto img={p.image} alt={p.title} sizes="(min-width:768px) 40vw, 100vw" className="aspect-[4/5] rounded-2xl" />}
       </div>) : <Empty>This page's content is managed from the admin dashboard (Pages → {pageKey}).</Empty>}
       {children}
     </Wrap>

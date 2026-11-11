@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pageHero } from "@/lib/queries";
 import { Photo } from "./photo";
+import ZoomPhoto from "./ZoomPhoto";
 import type { Img } from "@/db/schema";
 export { Photo };
 
@@ -67,8 +68,11 @@ export function Card({ href, img, title, meta, text }: { href: string; img?: Img
 
 /** Person card used for executives, pillars, committee members. */
 export function PersonCard({ img, name, role, sub, href }: { img?: Img | null; name: string; role?: string | null; sub?: string | null; href?: string }) {
+  const photo = href
+    ? <Photo img={img} alt={name} focus="portrait" sizes="(min-width:768px) 25vw, 50vw" className="aspect-[4/5] rounded-2xl" />
+    : <ZoomPhoto img={img} alt={name} focus="portrait" sizes="(min-width:768px) 25vw, 50vw" className="aspect-[4/5] rounded-2xl" />;
   const body = (<>
-    <Photo img={img} alt={name} focus="portrait" sizes="(min-width:768px) 25vw, 50vw" className="aspect-[4/5] rounded-2xl" />
+    {photo}
     <p className="mt-3 font-bold group-hover:text-emerald">{name}</p>
     {role && <p className="text-sm font-semibold text-emerald">{role}</p>}
     {sub && <p className="text-sm text-black/60">{sub}</p>}

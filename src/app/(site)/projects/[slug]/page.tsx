@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PreviewBanner, PageHeader, Photo, Rich, Wrap } from "@/components/public/ui";
+import { PreviewBanner, PageHeader, Rich, Wrap } from "@/components/public/ui";
 import { projectBySlug } from "@/lib/queries";
+import ZoomPhoto from "@/components/public/ZoomPhoto";
 import { meta, type SlugP, type SlugPreviewP } from "@/lib/seo";
 import { getSession } from "@/lib/auth";
 
@@ -11,7 +12,7 @@ export default async function Page({ params, searchParams }: SlugPreviewP) {
   const p = await projectBySlug((await params).slug, preview); if (!p) notFound();
   return (<><PageHeader title={p.title} sub={`${p.status.toUpperCase()}${p.year ? ` · ${p.year}` : ""}`} image={p.coverImage} />
     <Wrap narrow>
-      {p.coverImage && <Photo img={p.coverImage} alt={p.title} sizes="(min-width:768px) 768px, 100vw" className="aspect-[16/9] rounded-2xl" zoom={false} />}
+      {p.coverImage && <ZoomPhoto img={p.coverImage} alt={p.title} sizes="(min-width:768px) 768px, 100vw" className="aspect-[16/9] rounded-2xl" />}
       {p.summary && <p className="text-xl font-medium">{p.summary}</p>}{p.content && <Rich text={p.content} />}
       <Link href="/projects" className="font-semibold text-emerald">← All projects</Link></Wrap>{preview && <PreviewBanner />}</>);
 }

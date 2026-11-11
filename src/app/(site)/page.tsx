@@ -1,5 +1,6 @@
 import Link from "next/link";
 import * as q from "@/lib/queries";
+import ZoomPhoto from "@/components/public/ZoomPhoto";
 import HeroSlider from "@/components/public/HeroSlider";
 import MasonryGallery from "@/components/public/MasonryGallery";
 import { Photo, Section, Card, PersonCard, Empty, LinkButton } from "@/components/public/ui";
@@ -36,7 +37,7 @@ export default async function Home() {
     {(president || pillars.length > 0) && <Section n="02 / LEADERSHIP" title="Our leaders" href="/executives" hrefLabel="All executives →">
       <div className="grid gap-10 md:grid-cols-[1fr_1.2fr]">
         {president && <div className="grid gap-5 sm:grid-cols-[200px_1fr] md:grid-cols-1 lg:grid-cols-[220px_1fr]">
-          <Photo img={president.profileImage} alt={president.fullName} focus="portrait" sizes="220px" className="aspect-[4/5] rounded-2xl" />
+          <ZoomPhoto img={president.profileImage} alt={president.fullName} focus="portrait" sizes="220px" className="aspect-[4/5] rounded-2xl" />
           <div><p className="text-xs font-semibold tracking-[.24em] text-emerald">{president.position.toUpperCase()}</p><h3 className="display mt-1 text-3xl">{president.fullName}</h3>
             {president.bio && <p className="mt-3 line-clamp-6 text-black/70">{president.bio}</p>}
             <Link href={`/executives/${president.slug}`} className="mt-3 inline-block text-sm font-bold text-emerald">Read more →</Link></div></div>}
