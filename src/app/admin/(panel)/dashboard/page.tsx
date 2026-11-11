@@ -17,7 +17,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     c(s.news, eq(s.news.status, "published")), c(s.events, eq(s.events.status, "published")),
     c(s.galleryAlbums, eq(s.galleryAlbums.status, "published")), c(s.pageHeroes), c(s.stats, eq(s.stats.isActive, true)),
     c(s.pages, like(s.pages.body, "%Edit this page in Admin%")), c(s.pages)]);
-  const emailReady = !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM);
+  const emailReady = !!(process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL);
   const checks: { ok: boolean; label: string; href: string }[] = [
     { ok: !!(st.email && st.phone && st.address), label: "Contact details (email, phone, address)", href: "/admin/settings" },
     { ok: !!st.logo, label: "SRC logo uploaded", href: "/admin/settings" },
@@ -30,7 +30,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     { ok: news >= 1, label: "At least one published news story", href: "/admin/news" },
     { ok: events >= 1, label: "At least one published event", href: "/admin/events" },
     { ok: albumsWithPhotos >= 1, label: "At least one published media album", href: "/admin/gallery" },
-    { ok: emailReady, label: "Email sending configured (password reset + contact alerts)", href: "https://resend.com" },
+    { ok: emailReady, label: "Email sending configured (password reset + contact alerts)", href: "https://app.brevo.com" },
   ];
   const done = checks.filter((x) => x.ok).length;
   const tiles: [string, number, string][] = [

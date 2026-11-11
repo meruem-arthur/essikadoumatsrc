@@ -52,7 +52,7 @@ Flow: the Super Admin signs in → Admin Users → adds each admin with a tempor
 A thin bar (UMaT SRC · SRC Sports · SRID Railers) shows at the top of every page, with matching footer links. Addresses are managed in **Admin → Settings** (SRC Sports site URL, Railers basketball site URL); if left empty they default to `https://sports.umatsridsrc.com` and `https://railers.umatsridsrc.com`.
 
 ## Admin notes
-- **Forgot password:** `/admin/forgot-password` emails a single-use link (30 min). Needs `RESEND_API_KEY` + `MAIL_FROM` (verify your domain in Resend). Without them, local dev prints the link in the terminal and production refuses to send. After pulling this update run `npm run db:generate && npm run db:migrate` (new `password_resets` table).
+- **Forgot password:** `/admin/forgot-password` emails a single-use link (30 min). Needs `BREVO_API_KEY` + `BREVO_SENDER_EMAIL` (+ optional `BREVO_SENDER_NAME`), with the sender verified in Brevo. Without them, local dev prints the link in the terminal and production refuses to send. After pulling this update run `npm run db:generate && npm run db:migrate` (new `password_resets` table).
 - Admin lives at `/admin` on whatever domain you attach in Vercel (e.g. `essikadoumatsrc.com/admin`). Set `NEXT_PUBLIC_SITE_URL` to that domain.
 - **Admin Users** (Super Admin only): add users, assign roles, disable, reset passwords. Everyone can change their own password under **My account**; changing a password signs out all other sessions. The last active Super Admin can't be removed or disabled.
 - Content types live in `src/features/admin/resources.ts`: one entry = list + form + validation + permission.
